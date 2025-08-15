@@ -1,7 +1,7 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace FlatSystem.Controllers
 {
@@ -13,32 +13,52 @@ namespace FlatSystem.Controllers
 
         public FlatsController(IFlatRepository repo) => _repo = repo;
 
+        // GET: api/Flats
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
+        public async Task<IActionResult> GetAll()
+        {
+            var flats = await _repo.GetAllAsync();
+            return Ok(flats);
+        }
 
+        // GET: api/Flats/apartment/5
+        [HttpGet("apartment/{apartmentId}")]
+        public async Task<IActionResult> GetByApartmentId(int apartmentId)
+        {
+            var flats = await _repo.GetByApartmentIdAsync(apartmentId);
+            return Ok(flats);
+        }
+
+        // GET: api/Flats/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var flat = await _repo.GetByIdAsync(id);
-            if (flat == null) return NotFound();
+            if (flat == null)
+                return NotFound();
             return Ok(flat);
         }
 
+        // POST: api/Flats
         [HttpPost]
-        public async Task<IActionResult> Create(Flats flat)
+        public async Task<IActionResult> Create(CreateFlatDto flatDto)
         {
-            await _repo.AddAsync(flat);
-            return CreatedAtAction(nameof(Get), new { id = flat.Id }, flat);
+            await _repo.AddAsync(flatDto);
+            return CreatedAtAction(nameof(Get), new { id = flatDto.ApartmentId }, flatDto);
         }
 
+        // PUT: api/Flats/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Flats flat)
+        public async Task<IActionResult> Update(int id, FlatDto flatDto)
         {
-            if (id != flat.Id) return BadRequest();
-            await _repo.UpdateAsync(flat);
+            if (id != flatDto.Id)
+                return BadRequest();
+
+            await _repo.UpdateAsync(flatDto);
             return NoContent();
         }
 
+        // DELETE: api/Flats/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

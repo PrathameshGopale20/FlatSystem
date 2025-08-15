@@ -1,12 +1,13 @@
-﻿using FlatSystem.Models;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Models;
 
 namespace FlatSystem.Interface
 {
     public interface IAuditLogRepository
     {
-        Task<IEnumerable<AuditLog>> GetAllAsync();
-        Task<IEnumerable<AuditLog>> GetByUserIdAsync(int userId);
-        Task<AuditLog?> GetByIdAsync(int id);
-        Task AddAsync(AuditLog log);
+        Task<IEnumerable<AuditLogDto>> GetAllAsync();
+        Task<IEnumerable<AuditLogDto>> GetByUserIdAsync(int userId);
+        Task<AuditLogDto?> GetByIdAsync(int id);
+        Task AddAsync(AuditLogDto log);
     }
 }

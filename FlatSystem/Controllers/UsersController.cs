@@ -1,6 +1,5 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -25,30 +24,37 @@ namespace FlatSystem.Controllers
         }
 
         [HttpGet("username/{username}")]
-        public async Task<IActionResult> GetByUsername(string username) =>
-            Ok(await _repo.GetByUsernameAsync(username));
+        public async Task<IActionResult> GetByUsername(string username)
+        {
+            var user = await _repo.GetByUsernameAsync(username);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Users user)
+        public async Task<IActionResult> Create([FromBody] UserDto userDto)
         {
-            await _repo.AddAsync(user);
-            return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _repo.AddAsync(userDto);
+            return Ok(new { message = "User created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Users user)
+        public async Task<IActionResult> Update(int id, [FromBody] UserDto userDto)
         {
-            if (id != user.Id) return BadRequest();
-            await _repo.UpdateAsync(user);
-            return NoContent();
+            if (id != userDto.Id) return BadRequest("User ID mismatch.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _repo.UpdateAsync(userDto);
+            return Ok(new { message = "User updated successfully" });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _repo.DeleteAsync(id);
-            return NoContent();
+            return Ok(new { message = "User deleted successfully" });
         }
     }
 }
-

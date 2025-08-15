@@ -1,6 +1,5 @@
 ﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+using FlatSystem.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -14,7 +13,8 @@ namespace FlatSystem.Controllers
         public OwnersController(IOwnerRepository repo) => _repo = repo;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
+        public async Task<IActionResult> GetAll() =>
+            Ok(await _repo.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
@@ -25,21 +25,25 @@ namespace FlatSystem.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUser(int userId) =>
-            Ok(await _repo.GetByUserIdAsync(userId));
+        public async Task<IActionResult> GetByUser(int userId)
+        {
+            var owner = await _repo.GetByUserIdAsync(userId);
+            if (owner == null) return NotFound();
+            return Ok(owner);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Owners owner)
+        public async Task<IActionResult> Create(CreateOwnerDto ownerDto)
         {
-            await _repo.AddAsync(owner);
-            return CreatedAtAction(nameof(Get), new { id = owner.Id }, owner);
+            await _repo.AddAsync(ownerDto);
+            return Ok(new { message = "Owner created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Owners owner)
+        public async Task<IActionResult> Update(int id, OwnerDto ownerDto)
         {
-            if (id != owner.Id) return BadRequest();
-            await _repo.UpdateAsync(owner);
+            if (id != ownerDto.Id) return BadRequest("ID mismatch");
+            await _repo.UpdateAsync(ownerDto);
             return NoContent();
         }
 
@@ -49,6 +53,5 @@ namespace FlatSystem.Controllers
             await _repo.DeleteAsync(id);
             return NoContent();
         }
-
     }
 }

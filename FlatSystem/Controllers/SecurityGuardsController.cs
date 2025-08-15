@@ -1,6 +1,5 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -14,7 +13,8 @@ namespace FlatSystem.Controllers
         public SecurityGuardsController(ISecurityGuardRepository repo) => _repo = repo;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
+        public async Task<IActionResult> GetAll() =>
+            Ok(await _repo.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
@@ -25,21 +25,25 @@ namespace FlatSystem.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUser(int userId) =>
-            Ok(await _repo.GetByUserIdAsync(userId));
+        public async Task<IActionResult> GetByUser(int userId)
+        {
+            var guard = await _repo.GetByUserIdAsync(userId);
+            if (guard == null) return NotFound();
+            return Ok(guard);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Create(SecurityGuard guard)
+        public async Task<IActionResult> Create(CreateSecurityGuardDto guardDto)
         {
-            await _repo.AddAsync(guard);
-            return CreatedAtAction(nameof(Get), new { id = guard.Id }, guard);
+            await _repo.AddAsync(guardDto);
+            return Ok(new { message = "Security guard created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, SecurityGuard guard)
+        public async Task<IActionResult> Update(int id, SecurityGuardDto guardDto)
         {
-            if (id != guard.Id) return BadRequest();
-            await _repo.UpdateAsync(guard);
+            if (id != guardDto.Id) return BadRequest("ID mismatch");
+            await _repo.UpdateAsync(guardDto);
             return NoContent();
         }
 

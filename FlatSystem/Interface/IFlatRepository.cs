@@ -1,14 +1,15 @@
-﻿using FlatSystem.Models;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Models;
 
 namespace FlatSystem.Interface
 {
     public interface IFlatRepository
     {
-        Task<IEnumerable<Flats>> GetAllAsync();
-        Task<IEnumerable<Flats>> GetByApartmentIdAsync(int apartmentId);
-        Task<Flats?> GetByIdAsync(int id);
-        Task AddAsync(Flats flat);
-        Task UpdateAsync(Flats flat);
+        Task<IEnumerable<FlatDto>> GetAllAsync();
+        Task<IEnumerable<CreateFlatDto>> GetByApartmentIdAsync(int apartmentId);
+        Task<FlatDto?> GetByIdAsync(int id);
+        Task AddAsync(CreateFlatDto flat);
+        Task UpdateAsync(FlatDto flat);
         Task DeleteAsync(int id);
     }
 }

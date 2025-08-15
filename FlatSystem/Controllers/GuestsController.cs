@@ -1,6 +1,5 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -26,17 +25,18 @@ namespace FlatSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Guest guest)
+        public async Task<IActionResult> Create(CreateGuestDto guestDto)
         {
-            await _repo.AddAsync(guest);
-            return CreatedAtAction(nameof(Get), new { id = guest.Id }, guest);
+            await _repo.AddAsync(guestDto);
+            // Since ID is generated in the DB, you might need to re-fetch if you want to return it
+            return Ok(new { message = "Guest created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Guest guest)
+        public async Task<IActionResult> Update(int id, GuestDto guestDto)
         {
-            if (id != guest.Id) return BadRequest();
-            await _repo.UpdateAsync(guest);
+            if (id != guestDto.Id) return BadRequest("ID mismatch");
+            await _repo.UpdateAsync(guestDto);
             return NoContent();
         }
 

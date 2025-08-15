@@ -1,6 +1,5 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -26,25 +25,29 @@ namespace FlatSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Tenants tenant)
+        public async Task<IActionResult> Create([FromBody] CreateTenantDto tenantDto)
         {
-            await _repo.AddAsync(tenant);
-            return CreatedAtAction(nameof(Get), new { id = tenant.Id }, tenant);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _repo.AddAsync(tenantDto);
+            return Ok(new { message = "Tenant created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Tenants tenant)
+        public async Task<IActionResult> Update(int id, [FromBody] TenantDto tenantDto)
         {
-            if (id != tenant.Id) return BadRequest();
-            await _repo.UpdateAsync(tenant);
-            return NoContent();
+            if (id != tenantDto.Id) return BadRequest("Tenant ID mismatch.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _repo.UpdateAsync(tenantDto);
+            return Ok(new { message = "Tenant updated successfully" });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _repo.DeleteAsync(id);
-            return NoContent();
+            return Ok(new { message = "Tenant deleted successfully" });
         }
     }
 }

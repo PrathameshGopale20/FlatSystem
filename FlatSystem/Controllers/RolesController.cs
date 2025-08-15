@@ -1,6 +1,5 @@
 ﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+using FlatSystem.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -14,7 +13,8 @@ namespace FlatSystem.Controllers
         public RolesController(IRoleRepository repo) => _repo = repo;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
+        public async Task<IActionResult> GetAll() =>
+            Ok(await _repo.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
@@ -24,18 +24,26 @@ namespace FlatSystem.Controllers
             return Ok(role);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(Roles role)
+        [HttpGet("name/{roleName}")]
+        public async Task<IActionResult> GetByName(string roleName)
         {
-            await _repo.AddAsync(role);
-            return CreatedAtAction(nameof(Get), new { id = role.Id }, role);
+            var role = await _repo.GetByNameAsync(roleName);
+            if (role == null) return NotFound();
+            return Ok(role);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(RoleDto roleDto)
+        {
+            await _repo.AddAsync(roleDto);
+            return Ok(new { message = "Role created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Roles role)
+        public async Task<IActionResult> Update(int id, RoleDto roleDto)
         {
-            if (id != role.Id) return BadRequest();
-            await _repo.UpdateAsync(role);
+            if (id != roleDto.Id) return BadRequest("ID mismatch");
+            await _repo.UpdateAsync(roleDto);
             return NoContent();
         }
 

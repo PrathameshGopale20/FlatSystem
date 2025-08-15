@@ -1,42 +1,82 @@
 ﻿using FlatSystem.Data;
+using FlatSystem.Dtos;
 using FlatSystem.Interface;
 using FlatSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlatSystem.Repository
 {
-    public class ApartmentRepository:IApartmentRepository
+    public class ApartmentRepository : IApartmentRepository
     {
         private readonly AppDbContext _context;
-        public ApartmentRepository(AppDbContext context) => _context = context;
 
-        public async Task<IEnumerable<Apartments>> GetAllAsync() =>
-            await _context.Apartments.ToListAsync();
-
-        public async Task<Apartments?> GetByIdAsync(int id) =>
-            await _context.Apartments.FirstOrDefaultAsync(a => a.Id == id);
-
-        public async Task AddAsync(Apartments apartment)
+        public ApartmentRepository(AppDbContext context)
         {
-            _context.Apartments.Add(apartment);
+            _context = context;
+        }
+
+        public async Task<IEnumerable<ApartmentDto>> GetAllAsync()
+        {
+            return await _context.Apartments
+                .Select(a => new ApartmentDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Address = a.Address,
+                    TotalFlats = a.TotalFlats
+                })
+                .ToListAsync();
+        }
+
+        public async Task<ApartmentDto?> GetByIdAsync(int id)
+        {
+            return await _context.Apartments
+                .Where(a => a.Id == id)
+                .Select(a => new ApartmentDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Address = a.Address,
+                    TotalFlats = a.TotalFlats
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task AddAsync(CreateApartmentDto apartment)
+        {
+            var entity = new Apartments
+            {
+                Name = apartment.Name,
+                Address = apartment.Address,
+                TotalFlats = apartment.TotalFlats
+            };
+
+            _context.Apartments.Add(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Apartments apartment)
+        public async Task UpdateAsync(ApartmentDto apartment)
         {
-            _context.Apartments.Update(apartment);
+            var existing = await _context.Apartments.FindAsync(apartment.Id);
+            if (existing == null)
+                throw new KeyNotFoundException($"Apartment with ID {apartment.Id} not found.");
+
+            existing.Name = apartment.Name;
+            existing.Address = apartment.Address;
+            existing.TotalFlats = apartment.TotalFlats;
+
+            _context.Apartments.Update(existing);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var apt = await GetByIdAsync(id);
-            if (apt != null)
+            var existing = await _context.Apartments.FindAsync(id);
+            if (existing != null)
             {
-                _context.Apartments.Remove(apt);
+                _context.Apartments.Remove(existing);
                 await _context.SaveChangesAsync();
             }
         }
     }
 }
-

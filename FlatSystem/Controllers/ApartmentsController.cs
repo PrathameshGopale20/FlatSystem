@@ -1,6 +1,5 @@
-﻿using FlatSystem.Interface;
-using FlatSystem.Models;
-using Microsoft.AspNetCore.Http;
+﻿using FlatSystem.Dtos;
+using FlatSystem.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlatSystem.Controllers
@@ -19,7 +18,8 @@ namespace FlatSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _repo.GetAllAsync());
+            var apartments = await _repo.GetAllAsync();
+            return Ok(apartments);
         }
 
         [HttpGet("{id}")]
@@ -31,26 +31,26 @@ namespace FlatSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Apartments apartment)
+        public async Task<IActionResult> Create(CreateApartmentDto apartment)
         {
             await _repo.AddAsync(apartment);
-            return CreatedAtAction(nameof(Get), new { id = apartment.Id }, apartment);
+            return Ok(new { message = "Apartment created successfully" });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Apartments apartment)
+        public async Task<IActionResult> Update(int id, ApartmentDto apartment)
         {
-            if (id != apartment.Id) return BadRequest();
+            if (id != apartment.Id) return BadRequest("ID mismatch");
+
             await _repo.UpdateAsync(apartment);
-            return NoContent();
+            return Ok(new { message = "Apartment updated successfully" });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _repo.DeleteAsync(id);
-            return NoContent();
+            return Ok(new { message = "Apartment deleted successfully" });
         }
     }
 }
-    
