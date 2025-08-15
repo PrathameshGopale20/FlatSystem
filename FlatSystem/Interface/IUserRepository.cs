@@ -8,7 +8,7 @@ namespace FlatSystem.Interface
         Task<IEnumerable<UserDto>> GetAllAsync();
         Task<UserDto?> GetByIdAsync(int id);
         Task<UserDto?> GetByUsernameAsync(string username);
-        Task AddAsync(UserDto user);
+        Task AddAsync(CreateUserDto user);
         Task UpdateAsync(UserDto user);
         Task DeleteAsync(int id);
     }

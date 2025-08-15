@@ -3,6 +3,8 @@ using FlatSystem.Dtos;
 using FlatSystem.Interface;
 using FlatSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace FlatSystem.Repository
 {
@@ -77,15 +79,23 @@ namespace FlatSystem.Repository
                 .FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(UserDto userDto)
+        public async Task AddAsync(CreateUserDto createUserDto)
         {
+            // Generate salt and hash
+            using var hmac = new HMACSHA256();
+            var passwordSalt = Convert.ToBase64String(hmac.Key);
+            var passwordHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(createUserDto.Password)));
+
             var user = new Users
             {
-                Username = userDto.Username,
-                FullName = userDto.FullName,
-                ContactNumber = userDto.ContactNumber,
-                Email = userDto.Email,
-                RoleId = userDto.Role.Id
+                Username = createUserDto.Username,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                FullName = createUserDto.FullName,
+                ContactNumber = createUserDto.ContactNumber,
+                Email = createUserDto.Email,
+                RoleId = createUserDto.RoleId,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
@@ -102,6 +112,7 @@ namespace FlatSystem.Repository
                 user.ContactNumber = userDto.ContactNumber;
                 user.Email = userDto.Email;
                 user.RoleId = userDto.Role.Id;
+                user.UpdatedAt = DateTime.UtcNow;
 
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
