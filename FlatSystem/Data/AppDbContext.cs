@@ -20,6 +20,8 @@ namespace FlatSystem.Data
         public DbSet<SecurityGuard> SecurityGuards { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
 
+        public DbSet<Society> Societies { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

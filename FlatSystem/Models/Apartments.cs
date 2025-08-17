@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Sockets;
 
 namespace FlatSystem.Models
 {
@@ -15,6 +16,10 @@ namespace FlatSystem.Models
         public int TotalFlats { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+
+        public int SocietyId { get; set; }
+        public Society Society { get; set; }
+
 
         // Navigation
         public ICollection<Flats> Flats { get; set; } = new List<Flats>();
