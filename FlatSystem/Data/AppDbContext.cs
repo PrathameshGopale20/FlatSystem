@@ -113,7 +113,34 @@ namespace FlatSystem.Data
                 .WithMany()
                 .HasForeignKey(al => al.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Roles>().HasData(
+                new Roles
+                {
+                    Id = 1,
+                    RoleName = "SuperAdmin",
+
+                },
+                new Roles
+                {
+                    Id = 2,
+                    RoleName = "Secretary",
+
+                },
+                new Roles
+                {
+                    Id = 3,
+                    RoleName = "Owner",
+
+                },
+                new Roles
+                {
+                    Id = 4,
+                    RoleName = "Security Guard",
+
+                });
         }
+
     }
 
 }

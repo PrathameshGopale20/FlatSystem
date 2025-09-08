@@ -9,7 +9,7 @@ namespace FlatSystem.Interface
         Task<IEnumerable<CreateFlatDto>> GetByApartmentIdAsync(int apartmentId);
         Task<FlatDto?> GetByIdAsync(int id);
         Task AddAsync(CreateFlatDto flat);
-        Task UpdateAsync(FlatDto flat);
+        Task UpdateAsync(CreateFlatDto flat);
         Task DeleteAsync(int id);
     }
 }

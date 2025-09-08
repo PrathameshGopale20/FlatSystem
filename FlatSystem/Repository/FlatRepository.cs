@@ -44,6 +44,7 @@ namespace FlatSystem.Repository
                 .Where(f => f.ApartmentId == apartmentId)
                 .Select(f => new CreateFlatDto
                 {
+                    Id = f.Id,
                     ApartmentId = f.ApartmentId,
                     FlatNo = f.FlatNo,
                     RentAmount = f.RentAmount
@@ -93,7 +94,7 @@ namespace FlatSystem.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(FlatDto flat)
+        public async Task UpdateAsync(CreateFlatDto flat)
         {
             var existing = await _context.Flats.FindAsync(flat.Id);
             if (existing == null)
@@ -101,7 +102,7 @@ namespace FlatSystem.Repository
 
             existing.FlatNo = flat.FlatNo;
             existing.RentAmount = flat.RentAmount;
-            existing.Status = flat.Status;
+            // Keep status unchanged unless you plan to allow it here
 
             _context.Flats.Update(existing);
             await _context.SaveChangesAsync();
