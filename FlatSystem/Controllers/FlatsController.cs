@@ -41,18 +41,25 @@ namespace FlatSystem.Controllers
 
         // POST: api/Flats
         [HttpPost]
-        public async Task<IActionResult> Create(CreateFlatDto flatDto)
+        public async Task<IActionResult> Create([FromBody] CreateFlatDto flatDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _repo.AddAsync(flatDto);
-            return CreatedAtAction(nameof(Get), new { id = flatDto.ApartmentId }, flatDto);
+
+            return CreatedAtAction(nameof(Get), new { id = flatDto.Id }, flatDto);
         }
 
         // PUT: api/Flats/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, FlatDto flatDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CreateFlatDto flatDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (id != flatDto.Id)
-                return BadRequest();
+                return BadRequest("ID in URL and body do not match.");
 
             await _repo.UpdateAsync(flatDto);
             return NoContent();

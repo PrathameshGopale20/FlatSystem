@@ -7,6 +7,7 @@ using FlatSystem.Data;
 using FlatSystem.Interface;
 using FlatSystem.Repository;
 using FlatSystem.Service;
+using ProjectManegementTool.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                      });
+});
 
 // ===============================
 // 2. Repository Registrations
@@ -29,11 +40,12 @@ builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 builder.Services.AddScoped<ISecurityGuardRepository, SecurityGuardRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<FlatSystem.Interface.IAuth, FlatSystem.Service.AuthRepository>();
 
 // ===============================
 // 3. Services Registrations
 // ===============================
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<AuditService>();
 builder.Services.AddHttpContextAccessor(); // Required for AuditService
 
@@ -73,10 +85,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var allowedOrigins = builder.Configuration.GetValue<string>("allowedOrigins")!.Split(",");
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("").AllowAnyHeader().AllowAnyMethod();
+    });
+});
 // ===============================
 // 6. Build the app
 // ===============================
 var app = builder.Build();
+app.UseCors(MyAllowSpecificOrigins);
 
 // ===============================
 // 7. Middleware Pipeline
@@ -88,7 +110,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

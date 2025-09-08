@@ -29,7 +29,6 @@ namespace FlatSystem.Repository
                     {
                         Id = u.Role.Id,
                         RoleName = u.Role.RoleName,
-                        Description = u.Role.Description
                     }
                 })
                 .ToListAsync();
@@ -50,8 +49,7 @@ namespace FlatSystem.Repository
                     Role = new RoleDto
                     {
                         Id = u.Role.Id,
-                        RoleName = u.Role.RoleName,
-                        Description = u.Role.Description
+                        RoleName = u.Role.RoleName
                     }
                 })
                 .FirstOrDefaultAsync();
@@ -72,8 +70,7 @@ namespace FlatSystem.Repository
                     Role = new RoleDto
                     {
                         Id = u.Role.Id,
-                        RoleName = u.Role.RoleName,
-                        Description = u.Role.Description
+                        RoleName = u.Role.RoleName
                     }
                 })
                 .FirstOrDefaultAsync();

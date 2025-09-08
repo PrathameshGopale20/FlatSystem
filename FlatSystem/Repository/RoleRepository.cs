@@ -18,7 +18,6 @@ namespace FlatSystem.Repository
                 {
                     Id = r.Id,
                     RoleName = r.RoleName,
-                    Description = r.Description
                 })
                 .ToListAsync();
         }
@@ -31,7 +30,6 @@ namespace FlatSystem.Repository
                 {
                     Id = r.Id,
                     RoleName = r.RoleName,
-                    Description = r.Description
                 })
                 .FirstOrDefaultAsync();
         }
@@ -44,7 +42,6 @@ namespace FlatSystem.Repository
                 {
                     Id = r.Id,
                     RoleName = r.RoleName,
-                    Description = r.Description
                 })
                 .FirstOrDefaultAsync();
         }
@@ -54,7 +51,6 @@ namespace FlatSystem.Repository
             var entity = new Roles
             {
                 RoleName = role.RoleName,
-                Description = role.Description
             };
 
             _context.Roles.Add(entity);
@@ -68,8 +64,6 @@ namespace FlatSystem.Repository
                 throw new KeyNotFoundException($"Role with ID {role.Id} not found.");
 
             existing.RoleName = role.RoleName;
-            existing.Description = role.Description;
-
             _context.Roles.Update(existing);
             await _context.SaveChangesAsync();
         }
